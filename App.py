@@ -84,3 +84,4 @@ st.markdown("---")
 st.caption("Made with ❤ using Streamlit")
 
 st.markdown("**Developed by:** Mehak Naz  |  📧 nmehak875@gmail.com")
+
