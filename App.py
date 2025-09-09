@@ -3,17 +3,28 @@ import joblib
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Load the model (stored as a dict with key 'model')
-model_data = joblib.load("diabetes_model.pkl")
-model = model_data['model'] if isinstance(model_data, dict) else model_data
+# -------------------------
+# Load the model safely
+# -------------------------
+try:
+    model_data = joblib.load("diabetes_model.pkl")
+    # Handle both dict or direct model
+    model = model_data['model'] if isinstance(model_data, dict) else model_data
+except Exception as e:
+    st.error(f"⚠️ Error loading model: {e}")
+    st.stop()
 
+# -------------------------
 # Page settings
+# -------------------------
 st.set_page_config(page_title="Diabetes Prediction App", layout="wide")
 
 st.title("🩺 Diabetes Prediction Dashboard")
 st.write("A professional tool to assess diabetes risk based on patient metrics.")
 
+# -------------------------
 # Sidebar input form
+# -------------------------
 st.sidebar.header("Patient Information")
 
 with st.sidebar.form(key="patient_form"):
@@ -24,7 +35,9 @@ with st.sidebar.form(key="patient_form"):
     age = st.number_input("Age", min_value=0, max_value=120, value=30)
     submit_button = st.form_submit_button(label="Predict")
 
-# If predict button pressed
+# -------------------------
+# Prediction Logic
+# -------------------------
 if submit_button:
     try:
         features = np.array([[glucose, blood_pressure, insulin, bmi, age]])
@@ -37,13 +50,15 @@ if submit_button:
             if prediction == 1:
                 st.error("⚠ The patient is likely to have diabetes.")
                 st.subheader("Precautions:")
-                st.write("""
-                - Maintain a healthy, balanced diet  
-                - Exercise regularly  
-                - Monitor blood sugar frequently  
-                - Avoid sugary foods and drinks  
-                - Consult your doctor regularly  
-                """)
+                st.write(
+                    """
+                    - Maintain a healthy, balanced diet  
+                    - Exercise regularly  
+                    - Monitor blood sugar frequently  
+                    - Avoid sugary foods and drinks  
+                    - Consult your doctor regularly  
+                    """
+                )
             else:
                 st.success("✅ The patient is unlikely to have diabetes.")
                 st.write("Continue maintaining a healthy lifestyle!")
@@ -60,9 +75,11 @@ if submit_button:
             st.pyplot(fig)
 
     except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        st.error(f"⚠️ Error during prediction: {e}")
 
+# -------------------------
 # Footer
+# -------------------------
 st.markdown("---")
 st.caption("Made with ❤ using Streamlit")
 
